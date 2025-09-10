@@ -4,16 +4,19 @@ from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
 import re
 import string
+from pathlib import Path
 
 # Download required NLTK packages
 nltk.download('punkt')
 nltk.download('stopwords')
 nltk.download('wordnet')
 
-# Load dataset
-df = pd.read_csv("preprocessed_data.csv")  # If raw dataset, replace with your CSV path
-# Example: df = pd.read_csv("Genre Classification Dataset/train_data.txt", sep="\t", names=["ID", "Genre", "Description"])
+# Path to CSV
+CSV_PATH = Path(__file__).resolve().parent.parent / "data" / "preprocessed_data.csv"
 
+# Load dataset
+df = pd.read_csv(CSV_PATH)
+print("Dataset loaded from:", CSV_PATH)
 print("Dataset loaded.")
 print("Shape:", df.shape)
 

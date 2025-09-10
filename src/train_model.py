@@ -1,3 +1,15 @@
+from pathlib import Path
+import pandas as pd
+import pickle
+
+# Root directory of the project (one level above src/)
+ROOT_DIR = Path(__file__).resolve().parent.parent
+
+# Paths to data and models
+CSV_PATH = ROOT_DIR / "data" / "preprocessed_data.csv"
+MODEL_PATH = ROOT_DIR / "models" / "movie_genre_model.pkl"
+VECTORIZER_PATH = ROOT_DIR / "models" / "tfidf_vectorizer.pkl"
+
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -10,7 +22,16 @@ import warnings
 warnings.filterwarnings("ignore")
 
 # Load preprocessed dataset
-df = pd.read_csv("preprocessed_data.csv")
+df = pd.read_csv(CSV_PATH)
+
+# Example for loading model/vectorizer
+with open(MODEL_PATH, "rb") as f:
+    model = pickle.load(f)
+
+with open(VECTORIZER_PATH, "rb") as f:
+    vectorizer = pickle.load(f)
+
+
 
 # Features and labels
 X = df["Clean_Description"]

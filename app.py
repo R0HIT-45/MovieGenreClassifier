@@ -1,15 +1,22 @@
-import streamlit as st
+from pathlib import Path
 import pickle
+import streamlit as st
 import re
 import nltk
 from nltk.corpus import stopwords
 from nltk.stem import WordNetLemmatizer
 
+# Base directory of the project
+BASE_DIR = Path(__file__).resolve().parent  # This is MovieGenreClassifier/
+
+MODEL_PATH = BASE_DIR / "models" / "movie_genre_model.pkl"
+VECTORIZER_PATH = BASE_DIR / "models" / "tfidf_vectorizer.pkl"
+
 # Load trained model and vectorizer
-with open("movie_genre_model.pkl", "rb") as f:
+with open(MODEL_PATH, "rb") as f:
     model = pickle.load(f)
 
-with open("tfidf_vectorizer.pkl", "rb") as f:
+with open(VECTORIZER_PATH, "rb") as f:
     vectorizer = pickle.load(f)
 
 # NLTK setup
@@ -21,13 +28,9 @@ lemmatizer = WordNetLemmatizer()
 stop_words = set(stopwords.words("english"))
 
 def preprocess_text(text):
-    # Remove non-alphabetic characters
     text = re.sub(r"[^a-zA-Z\s]", "", text)
-    # Lowercase
     text = text.lower()
-    # Tokenize
     tokens = nltk.word_tokenize(text)
-    # Remove stopwords and lemmatize
     tokens = [lemmatizer.lemmatize(word) for word in tokens if word not in stop_words]
     return " ".join(tokens)
 
@@ -42,10 +45,17 @@ if st.button("Predict Genre"):
         st.warning("Please enter a movie description!")
     else:
         processed = preprocess_text(description)
-        # Check if input is valid
-        if len(processed) < 3:
+        if len(processed.split()) < 3:
             st.error("Invalid or insufficient description. Please enter a valid movie description.")
         else:
             vect = vectorizer.transform([processed])
-            prediction = model.predict(vect)[0]
-            st.success(f"Predicted Genre: **{prediction}**")
+            # Predict probabilities
+            probs = model.predict_proba(vect)[0]
+            classes = model.classes_
+            # Top 3 predictions
+            top_idx = probs.argsort()[::-1][:3]
+            top_genres = [(classes[i], probs[i]) for i in top_idx]
+
+            st.success("Predicted Genres (Top 3):")
+            for genre, prob in top_genres:
+                st.write(f"**{genre}**: {prob*100:.2f}%")

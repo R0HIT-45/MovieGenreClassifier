@@ -2,12 +2,18 @@ import pickle
 import re
 from sklearn.feature_extraction.text import TfidfVectorizer
 import numpy as np
+from pathlib import Path
+
+# Paths
+BASE_DIR = Path(__file__).resolve().parent.parent  # Go up to MovieGenreClassifier/
+MODEL_PATH = BASE_DIR / "models" / "movie_genre_model.pkl"
+VECTORIZER_PATH = BASE_DIR / "models" / "tfidf_vectorizer.pkl"
 
 # Load trained model and vectorizer
-with open("movie_genre_model.pkl", "rb") as f:
+with open(MODEL_PATH, "rb") as f:
     model = pickle.load(f)
 
-with open("tfidf_vectorizer.pkl", "rb") as f:
+with open(VECTORIZER_PATH, "rb") as f:
     vectorizer = pickle.load(f)
 
 print("🎬 Movie Genre Predictor")
